@@ -1,36 +1,60 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# RUNSA Digital Voting System - Frontend
 
-## Getting Started
+The **RUNSA Digital Voting System** is a secure, premium, and modern web application built for the Redeemer's University Students' Association (RUNSA). It enables students to participate in campus-wide and departmental elections seamlessly while providing administrators with powerful tools to manage elections, candidates, and live results.
 
-First, run the development server:
+## 🚀 Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### For Voters:
+- **Secure Authentication**: Log in using your Matric Number and a secure password.
+- **Role-Based Routing**: Voters are automatically directed to their eligible elections based on their assigned department.
+- **Interactive Voting Booth**: A beautifully designed, glassmorphism-styled interface with sticky progress tracking and candidate manifesto insights.
+- **Digital Receipts**: Receive a unique, cryptographic verification hash (SHA-256) upon casting your vote.
+- **Results Portal**: View the final results of closed elections with animated progress bars and clear placement indicators.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### For Administrators:
+- **Election Management**: Create and configure elections (Campus-wide or Departmental) with exact start and end dates.
+- **Position & Candidate Setup**: Add positions (e.g., President, Secretary) and manage candidate profiles.
+- **User Management**: Approve and assign departments to registered voters to prevent unauthorized voting.
+- **Live Results Dashboard**: Monitor voting statistics in real-time.
+- **Audit Logs**: View a tamper-proof cryptographic audit trail of all system activities (logins, election creations, votes cast).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🛠️ Tech Stack
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Framework**: Next.js 14 (App Router)
+- **Language**: TypeScript
+- **Styling**: Vanilla CSS with modern Design Tokens (CSS Variables)
+- **State Management**: Zustand (with localStorage persistence)
+- **Data Fetching**: React Query & Axios
+- **Animations**: Framer Motion
 
-## Learn More
+## 🔌 Connecting to the Backend
 
-To learn more about Next.js, take a look at the following resources:
+This frontend relies on the RUNSA Voting API. Follow these steps to connect them:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. **Clone the Backend Repository** (if not already done) and set it up according to its instructions (typically running `npm install`, setting up the `.env`, and running `npx prisma db push` or `prisma migrate`).
+2. **Start the Backend API**. By default, it runs on `http://localhost:4000`.
+3. **Configure the Frontend Environment Variables**:
+   In the root of this frontend project, locate or create the `.env.local` file and ensure the API base URL points to your running backend:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+   ```env
+   NEXT_PUBLIC_API_BASE_URL=http://localhost:4000
+   ```
+   *(If you deploy the backend to a cloud provider like Render or Heroku, replace `http://localhost:4000` with your production URL).*
 
-## Deploy on Vercel
+4. **Install Dependencies and Run**:
+   ```bash
+   npm install
+   npm run dev
+   ```
+   The frontend will now be accessible at `http://localhost:3000`.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🎨 UI Design System
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This project features a fully custom design system focused on a premium look-and-feel. Instead of Tailwind CSS, it utilizes a strict, token-based CSS architecture (`globals.css`) that features:
+- **Deep Navy & Premium Accents**: `var(--navy-900)`, `var(--navy-600)` and bright interactive states.
+- **Glassmorphism**: Translucent panels with background blur and gradient mesh backgrounds.
+- **Micro-Animations**: Extensive use of `framer-motion` for page transitions, button clicks, hover states, and dynamic data rendering.
+
+## 🔒 Security
+
+All API requests are intercepted by `axios` in `src/lib/api.ts` to attach the Bearer token stored by Zustand. If a 401 Unauthorized status is returned, the app gracefully logs the user out and redirects to the login screen.
