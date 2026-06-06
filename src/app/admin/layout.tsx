@@ -208,8 +208,17 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         </header>
 
         {/* Page content */}
-        <div style={{ padding: "28px 32px", flex: 1, overflowX: "hidden" }}>
-          {children}
+        <div style={{ padding: "28px 32px", flex: 1, overflowX: "hidden", display: "flex", flexDirection: "column" }}>
+          <div style={{ flex: 1 }}>{children}</div>
+          <footer style={{ marginTop: 40, borderTop: "1px solid #e2e8f0", paddingTop: 16, display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 11, color: "#94a3b8", flexWrap: "wrap", gap: 8 }}>
+            <span>© {new Date().getFullYear()} RUNSA. All rights reserved.</span>
+            <span>
+              Developed by{" "}
+              <a href="https://itzbobo.dev" target="_blank" rel="noopener noreferrer" style={{ color: "#2563eb", textDecoration: "none", fontWeight: 700 }}>
+                itzbobo.dev
+              </a>
+            </span>
+          </footer>
         </div>
       </main>
 

@@ -52,8 +52,8 @@ export default function ElectionDetailPage() {
         <div className="card">
           <h3 className="card-title">Election Details</h3>
           <div style={{ display: "grid", gap: "12px", marginTop: "12px", fontSize: "14px" }}>
-            <div><strong>Start:</strong> {new Date(election.startAt).toLocaleString()}</div>
-            <div><strong>End:</strong> {new Date(election.endAt).toLocaleString()}</div>
+            <div><strong>Start:</strong> {election.startAt ? new Date(election.startAt).toLocaleString() : "TBD"}</div>
+            <div><strong>End:</strong> {election.endAt ? new Date(election.endAt).toLocaleString() : "TBD"}</div>
           </div>
           {statusFlow[election.status]?.length > 0 && (
             <div style={{ marginTop: "16px", display: "flex", gap: "8px" }}>

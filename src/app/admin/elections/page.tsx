@@ -140,8 +140,8 @@ export default function ElectionsPage() {
                     {el.status}
                   </span>
                 </div>
-                <div style={{ fontSize: "12px", color: "#6b7280" }}>{new Date(el.startAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</div>
-                <div style={{ fontSize: "12px", color: "#6b7280" }}>{new Date(el.endAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</div>
+                <div style={{ fontSize: "12px", color: "#6b7280" }}>{el.startAt ? new Date(el.startAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "TBD"}</div>
+                <div style={{ fontSize: "12px", color: "#6b7280" }}>{el.endAt ? new Date(el.endAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "TBD"}</div>
                 <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
                   {nextStatuses.map((ns) => {
                     const nc = NEXT_LABEL[ns];

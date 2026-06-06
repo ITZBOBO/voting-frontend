@@ -183,7 +183,7 @@ export default function AdminDashboard() {
                       {el.title}
                     </div>
                     <div style={{ fontSize: "12px", color: "#9ca3af", marginTop: "2px" }}>
-                      {el.type?.name || "General"} · Ends {new Date(el.endAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                      {el.type?.name || "General"} {el.endAt ? `· Ends ${new Date(el.endAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}` : ""}
                     </div>
                   </div>
 

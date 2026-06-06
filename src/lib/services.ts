@@ -328,3 +328,46 @@ export async function createRole(payload: { name: string; description?: string; 
   return data;
 }
 
+// ─── Voter Settings & History ──────────────────────────
+export interface VoteReceiptHistory {
+  id: string;
+  receiptId: string;
+  electionId: string;
+  positionId: string;
+  createdAt: string;
+  election: {
+    id: string;
+    title: string;
+    status: string;
+    endAt: string | null;
+  };
+  position: {
+    id: string;
+    name: string;
+  };
+}
+
+export async function changePassword(payload: { currentPassword: string; newPassword: string }): Promise<{ message: string }> {
+  const { data } = await api.post("/auth/change-password", payload);
+  return data;
+}
+
+export async function getVoteHistory(): Promise<VoteReceiptHistory[]> {
+  const { data } = await api.get("/votes/my-history");
+  return data.receipts;
+}
+
+export interface VoterActivity {
+  id: string;
+  action: string;
+  details: any;
+  createdAt: string;
+}
+
+export async function getVoterActivity(): Promise<VoterActivity[]> {
+  const { data } = await api.get("/activity");
+  return data.logs;
+}
+
+
+

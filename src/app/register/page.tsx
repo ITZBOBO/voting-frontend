@@ -116,6 +116,9 @@ export default function RegisterPage() {
 
       <footer className="portal-footer">
         <p>Copyright © {new Date().getFullYear()} Redeemer&rsquo;s University. All Rights Reserved.</p>
+        <p style={{ marginTop: 4, fontSize: "11px", color: "rgba(255,255,255,0.4)" }}>
+          Developed by <a href="https://itzbobo.dev" target="_blank" rel="noopener noreferrer" style={{ color: "#3b82f6", textDecoration: "underline", fontWeight: 600 }}>itzbobo.dev</a>
+        </p>
       </footer>
     </div>
   );

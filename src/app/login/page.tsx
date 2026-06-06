@@ -186,7 +186,9 @@ export default function StudentLoginPage() {
           Copyright © {new Date().getFullYear()} Redeemer&rsquo;s University.
           All Rights Reserved.
         </p>
-        <p>RUNSA Digital Voting Portal</p>
+        <p style={{ marginTop: 4 }}>
+          RUNSA Digital Voting Portal — Developed by <a href="https://itzbobo.dev" target="_blank" rel="noopener noreferrer" style={{ color: "#3b82f6", textDecoration: "underline", fontWeight: 600 }}>itzbobo.dev</a>
+        </p>
       </footer>
 
       <style jsx>{`
@@ -524,16 +526,19 @@ export default function StudentLoginPage() {
           .portal-card {
             grid-template-columns: 1fr;
           }
+          .portal-form-section {
+            order: 1;
+            padding: 28px 24px 24px;
+          }
           .portal-divider {
+            order: 2;
             width: auto;
             height: 1px;
             margin: 0 24px;
           }
           .portal-instructions {
-            padding: 28px 24px 20px;
-          }
-          .portal-form-section {
-            padding: 20px 24px 28px;
+            order: 3;
+            padding: 24px 24px 28px;
           }
           .portal-nav-inner {
             justify-content: center;

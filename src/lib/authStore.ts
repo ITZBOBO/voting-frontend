@@ -5,7 +5,9 @@ export interface User {
   id: string;
   matricNo: string;
   fullName: string;
+  schoolEmail?: string | null;
   departmentId: string | null;
+  department: string | null;
   roles: string[]; // e.g. ["voter"], ["admin"], ["super_admin"]
 }
 

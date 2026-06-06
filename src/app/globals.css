@@ -649,3 +649,50 @@ tbody tr:last-child td {
     margin: 16px;
   }
 }
+
+/* ─── Voter Layout Styles ────────────────────────────── */
+@keyframes orbDrift {
+  0% { transform: translate(0,0) scale(1); }
+  100% { transform: translate(30px, 20px) scale(1.05); }
+}
+
+@keyframes glowBarShift {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 200% 0%; }
+}
+
+@keyframes vlSpin { 
+  to { transform: rotate(360deg); } 
+}
+
+@keyframes epSpin { 
+  to { transform: rotate(360deg); } 
+}
+
+@keyframes livePulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 6px #f87171; }
+  50% { opacity: 0.6; box-shadow: 0 0 12px #f87171; }
+}
+
+@keyframes vrSpin { 
+  to { transform: rotate(360deg); } 
+}
+
+/* Sidebar scrollbar style */
+.scrollbar-sidebar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}
+.scrollbar-sidebar::-webkit-scrollbar {
+  width: 5px;
+}
+.scrollbar-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-sidebar::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+}
+.scrollbar-sidebar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+}
