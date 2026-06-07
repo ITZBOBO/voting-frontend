@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getEligibleElections, type Election } from "@/lib/services";
 import { motion } from "framer-motion";
@@ -23,7 +24,27 @@ export default function VoterElectionsPage() {
     queryFn: getEligibleElections,
   });
 
+  const [sortBy, setSortBy] = useState<"closest" | "recent" | "az">("closest");
+  const [showSort, setShowSort] = useState(false);
+
   const now = new Date();
+
+  const sortedElections = elections ? [...elections].sort((a, b) => {
+    if (sortBy === "closest") {
+      const endA = a.endAt ? new Date(a.endAt).getTime() : Infinity;
+      const endB = b.endAt ? new Date(b.endAt).getTime() : Infinity;
+      return endA - endB;
+    }
+    if (sortBy === "recent") {
+      const startA = a.startAt ? new Date(a.startAt).getTime() : 0;
+      const startB = b.startAt ? new Date(b.startAt).getTime() : 0;
+      return startB - startA;
+    }
+    if (sortBy === "az") {
+      return (a.title || "").localeCompare(b.title || "");
+    }
+    return 0;
+  }) : [];
 
   return (
     <>
@@ -147,10 +168,19 @@ export default function VoterElectionsPage() {
               <p className="vd-section-sub">Cast your vote before the deadline.</p>
             </div>
           </div>
-          <button className="vd-sort-btn">
-            Sort by: Closest closing
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9"/></svg>
-          </button>
+          <div style={{ position: "relative" }}>
+            <button className="vd-sort-btn" onClick={() => setShowSort(!showSort)}>
+              Sort by: {sortBy === "closest" ? "Closest closing" : sortBy === "recent" ? "Recently opened" : "A-Z"}
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            {showSort && (
+              <div style={{ position: "absolute", top: "100%", right: 0, marginTop: 4, background: "white", border: "1px solid #e2e8f0", borderRadius: 8, boxShadow: "0 4px 12px rgba(0,0,0,0.1)", zIndex: 10, minWidth: 150, overflow: "hidden" }}>
+                <div onClick={() => { setSortBy("closest"); setShowSort(false); }} style={{ padding: "8px 12px", fontSize: 13, cursor: "pointer", background: sortBy === "closest" ? "#f1f5f9" : "transparent", color: "#0e1628" }} onMouseEnter={(e) => e.currentTarget.style.background = "#f8fafc"} onMouseLeave={(e) => e.currentTarget.style.background = sortBy === "closest" ? "#f1f5f9" : "transparent"}>Closest closing</div>
+                <div onClick={() => { setSortBy("recent"); setShowSort(false); }} style={{ padding: "8px 12px", fontSize: 13, cursor: "pointer", background: sortBy === "recent" ? "#f1f5f9" : "transparent", color: "#0e1628" }} onMouseEnter={(e) => e.currentTarget.style.background = "#f8fafc"} onMouseLeave={(e) => e.currentTarget.style.background = sortBy === "recent" ? "#f1f5f9" : "transparent"}>Recently opened</div>
+                <div onClick={() => { setSortBy("az"); setShowSort(false); }} style={{ padding: "8px 12px", fontSize: 13, cursor: "pointer", background: sortBy === "az" ? "#f1f5f9" : "transparent", color: "#0e1628" }} onMouseEnter={(e) => e.currentTarget.style.background = "#f8fafc"} onMouseLeave={(e) => e.currentTarget.style.background = sortBy === "az" ? "#f1f5f9" : "transparent"}>A-Z</div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Cards */}
@@ -159,9 +189,9 @@ export default function VoterElectionsPage() {
             <div className="vd-spinner" />
             <span style={{ fontSize: 13, color: "#94a3b8", fontWeight: 600 }}>Loading elections…</span>
           </div>
-        ) : elections && elections.length > 0 ? (
+        ) : sortedElections && sortedElections.length > 0 ? (
           <div className="vd-grid">
-            {elections.map((el: Election, index: number) => {
+            {sortedElections.map((el: Election, index: number) => {
               const isOpen = el.status === "OPEN";
               const start = typeof el.startAt === "string" ? new Date(el.startAt) : null;
               const end   = typeof el.endAt   === "string" ? new Date(el.endAt)   : null;
