@@ -83,6 +83,29 @@ export default function VoteLayout({ children }: { children: ReactNode }) {
           <div style={{ borderTop: "1px solid rgba(255,255,255,0.07)", paddingTop: 14, marginBottom: 12 }}>
             <div style={{ fontSize: 9, fontWeight: 700, color: "#475569", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 4 }}>Department</div>
             <div style={{ fontSize: 13, fontWeight: 700, color: "#fff" }}>{user?.department || "—"}</div>
+            
+            {(user?.faculty || user?.level || user?.semester) && (
+              <div style={{ display: "flex", gap: 12, marginTop: 10 }}>
+                {user?.level && (
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 9, fontWeight: 700, color: "#475569", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 4 }}>Level</div>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: "#e2e8f0" }}>{user.level}</div>
+                  </div>
+                )}
+                {user?.faculty && (
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 9, fontWeight: 700, color: "#475569", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 4 }}>Faculty</div>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: "#e2e8f0", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }} title={user.faculty}>{user.faculty}</div>
+                  </div>
+                )}
+                {user?.semester && (
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 9, fontWeight: 700, color: "#475569", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 4 }}>Semester</div>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: "#e2e8f0" }}>{user.semester}</div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "4px 10px", borderRadius: 999, background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.25)" }}>
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>

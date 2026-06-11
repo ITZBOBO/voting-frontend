@@ -172,9 +172,9 @@ export default function StudentLoginPage() {
             </form>
 
             <div className="portal-form-links">
-              <Link href="/register" className="portal-admin-link">
-                New student? <span>Register here →</span>
-              </Link>
+              <span className="portal-admin-link">
+                Having trouble logging in? <span>Contact Support</span>
+              </span>
             </div>
           </div>
         </div>

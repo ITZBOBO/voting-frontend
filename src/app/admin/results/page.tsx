@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getAdminElections, getElectionResults, getCandidates } from "@/lib/services";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const CHART_COLORS = ["#2563eb", "#10b981", "#f59e0b", "#6366f1", "#ec4899", "#14b8a6"];
 
@@ -30,13 +32,90 @@ export default function AdminResultsPage() {
   const tally = resultData?.tally ?? [];
   const totalVotes = tally.reduce((s, p) => s + p.results.reduce((a, c) => a + c.count, 0), 0);
 
+  const exportToPDF = () => {
+    if (!resultData || !selectedId) return;
+    const election = elections?.find((e) => e.id === selectedId);
+    if (!election) return;
+
+    const doc = new jsPDF();
+    
+    // Title
+    doc.setFontSize(18);
+    doc.text(`${election.title} - Official Results`, 14, 22);
+    
+    // Stats
+    doc.setFontSize(11);
+    doc.setTextColor(100);
+    doc.text(`Total Votes Cast: ${totalVotes}`, 14, 30);
+    doc.text(`Election Status: ${election.status}`, 14, 36);
+    
+    let currentY = 46;
+
+    tally.forEach((pos) => {
+      if (currentY > 250) {
+        doc.addPage();
+        currentY = 20;
+      }
+      
+      doc.setFontSize(14);
+      doc.setTextColor(20, 20, 20);
+      doc.text(`Position: ${pos.positionName}`, 14, currentY);
+      currentY += 6;
+      
+      const posTotalVotes = pos.results.reduce((a, c) => a + c.count, 0);
+      const sorted = [...pos.results].sort((a, b) => b.count - a.count);
+      
+      const tableData = sorted.map((cand, idx) => {
+        const pct = posTotalVotes > 0 ? ((cand.count / posTotalVotes) * 100).toFixed(1) + "%" : "0%";
+        let status = "";
+        if (idx === 0 && cand.count > 0) status = "Winner";
+        return [
+          cand.name,
+          cand.department || "—",
+          cand.count.toString(),
+          pct,
+          status
+        ];
+      });
+
+      autoTable(doc, {
+        startY: currentY,
+        head: [["Candidate Name", "Department", "Votes", "Percentage", "Status"]],
+        body: tableData,
+        headStyles: { fillColor: [37, 99, 235] },
+        margin: { left: 14 },
+      });
+      
+      currentY = (doc as any).lastAutoTable.finalY + 14;
+    });
+
+    doc.save(`${election.title.replace(/\s+/g, '_')}_Results.pdf`);
+  };
+
   return (
     <div style={{ maxWidth: "1100px" }}>
 
       {/* Header */}
-      <div style={{ marginBottom: "24px" }}>
-        <h1 style={{ fontSize: "22px", fontWeight: 700, color: "#0c1a3a", marginBottom: "4px", letterSpacing: "-0.3px" }}>Results</h1>
-        <p style={{ fontSize: "13px", color: "#9ca3af" }}>Official outcomes for completed elections</p>
+      <div style={{ marginBottom: "24px", display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+        <div>
+          <h1 style={{ fontSize: "22px", fontWeight: 700, color: "#0c1a3a", marginBottom: "4px", letterSpacing: "-0.3px" }}>Results</h1>
+          <p style={{ fontSize: "13px", color: "#9ca3af" }}>Official outcomes for completed elections</p>
+        </div>
+        {selectedId && tally.length > 0 && (
+          <button
+            onClick={exportToPDF}
+            style={{ display: "flex", alignItems: "center", gap: "8px", background: "#2563eb", color: "#fff", border: "none", padding: "8px 16px", borderRadius: "8px", fontSize: "13px", fontWeight: 600, cursor: "pointer", transition: "opacity 0.2s" }}
+            onMouseOver={(e) => (e.currentTarget.style.opacity = "0.9")}
+            onMouseOut={(e) => (e.currentTarget.style.opacity = "1")}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Export PDF
+          </button>
+        )}
       </div>
 
       {/* Stats + Selector */}

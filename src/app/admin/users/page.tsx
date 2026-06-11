@@ -69,13 +69,7 @@ export default function UsersPage() {
         <p style={{ fontSize: "13px", color: "#9ca3af" }}>Manage registered voters and assign department access</p>
       </div>
 
-      {/* Notice */}
-      <div style={{ display: "flex", gap: "10px", background: "#fffbeb", border: "1px solid #fde68a", borderRadius: "10px", padding: "12px 16px", marginBottom: "20px" }}>
-        <span style={{ fontSize: "15px", flexShrink: 0 }}>🔒</span>
-        <p style={{ fontSize: "12.5px", color: "#92400e", lineHeight: 1.5, margin: 0 }}>
-          <strong>Department is admin-controlled.</strong> Assign a student's department only after verifying their official enrollment. This determines which departmental elections they can vote in.
-        </p>
-      </div>
+
 
       {/* Toolbar */}
       <div style={{ display: "flex", gap: "10px", marginBottom: "14px", flexWrap: "wrap", alignItems: "center" }}>
@@ -113,8 +107,8 @@ export default function UsersPage() {
         ) : filtered.length > 0 ? (
           <>
             {/* Table Header */}
-            <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1.5fr 1.5fr 1.5fr 1fr 1fr 1fr", padding: "10px 20px", background: "#f8f9fb", borderBottom: "1px solid #e8eaf0", gap: "12px" }}>
-              {["Matric No", "Full Name", "Email", "Department", "Roles", "Status", "Action"].map(h => (
+            <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1.5fr 2fr 1fr 1fr 1fr", padding: "10px 20px", background: "#f8f9fb", borderBottom: "1px solid #e8eaf0", gap: "12px" }}>
+              {["Matric No", "Full Name", "Department", "Roles", "Status", "Action"].map(h => (
                 <div key={h} style={{ fontSize: "11px", fontWeight: 700, color: "#9ca3af", textTransform: "uppercase", letterSpacing: "0.5px" }}>{h}</div>
               ))}
             </div>
@@ -124,25 +118,13 @@ export default function UsersPage() {
               return (
                 <div
                   key={u.id}
-                  style={{ display: "grid", gridTemplateColumns: "1.5fr 1.5fr 1.5fr 1.5fr 1fr 1fr 1fr", padding: "13px 20px", borderBottom: isLast ? "none" : "1px solid #f5f6fa", gap: "12px", alignItems: "center", transition: "background 0.15s" }}
+                  style={{ display: "grid", gridTemplateColumns: "1.5fr 1.5fr 2fr 1fr 1fr 1fr", padding: "13px 20px", borderBottom: isLast ? "none" : "1px solid #f5f6fa", gap: "12px", alignItems: "center", transition: "background 0.15s" }}
                   onMouseEnter={e => (e.currentTarget.style.background = "#fafbfd")}
                   onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
                 >
                   <div style={{ fontFamily: "monospace", fontSize: "12px", color: "#374151" }}>{u.matricNo}</div>
                   <div style={{ fontSize: "13px", fontWeight: 600, color: "#0c1a3a" }}>{u.fullName || "—"}</div>
-                  <div style={{ fontSize: "12px", color: "#9ca3af", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{u.schoolEmail || "—"}</div>
-                  <div>
-                    <select
-                      value={u.departmentId ?? ""}
-                      onChange={e => deptMut.mutate({ id: u.id, departmentId: e.target.value || null })}
-                      style={{ padding: "5px 8px", border: "1px solid #e8eaf0", borderRadius: "6px", fontSize: "12px", color: "#374151", background: "#fff", outline: "none", cursor: "pointer", maxWidth: "100%", fontFamily: "inherit" }}
-                    >
-                      <option value="">— Unassigned —</option>
-                      {(departments as Department[] | undefined)?.map(d => (
-                        <option key={d.id} value={d.id}>{d.name}</option>
-                      ))}
-                    </select>
-                  </div>
+                  <div style={{ fontSize: "12px", color: "#475569" }}>{u.department || "—"}</div>
                   <div style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}>
                     {u.roles.map(r => {
                       const rc = ROLE_CFG[r] || { bg: "#f5f6fa", color: "#6b7280" };

@@ -160,9 +160,9 @@ export default function VoterResultsPage() {
         .vr-cand-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; flex-wrap: wrap; gap: 8px; }
         .vr-cand-left { display: flex; align-items: center; gap: 10px; }
         .vr-cand-avatar {
-          width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
+          width: 42px; height: 50px; border-radius: 8px; flex-shrink: 0;
           display: flex; align-items: center; justify-content: center;
-          font-size: 12px; font-weight: 700;
+          font-size: 12px; font-weight: 700; overflow: hidden;
         }
         .vr-cand-name   { font-size: 13px; font-weight: 700; color: #0e1628; margin: 0 0 2px; }
         .vr-cand-dept   { font-size: 11px; color: #94a3b8; margin: 0; }
@@ -309,7 +309,11 @@ export default function VoterResultsPage() {
                             <div className="vr-cand-top">
                               <div className="vr-cand-left">
                                 <div className="vr-cand-avatar" style={{ background: isWinner ? "#dbeafe" : "#e8ecf2", color: isWinner ? "#2563eb" : "#64748b" }}>
-                                  {cand.name.slice(0, 2).toUpperCase()}
+                                  {cand.photoUrl ? (
+                                    <img src={cand.photoUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                                  ) : (
+                                    cand.name.slice(0, 2).toUpperCase()
+                                  )}
                                 </div>
                                 <div>
                                   <p className="vr-cand-name">

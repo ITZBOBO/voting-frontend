@@ -40,6 +40,7 @@ export default function VotingPage() {
   const [done, setDone] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [zoomedImage, setZoomedImage] = useState<string | null>(null);
 
   const { data: positions, isLoading } = useQuery({
     queryKey: ["voter-positions", eId],
@@ -323,7 +324,16 @@ export default function VotingPage() {
                                 </div>
 
                                 {/* Avatar */}
-                                <div className="vb-avatar" style={{ background: palette.bg, color: palette.text }}>
+                                <div
+                                  className="vb-avatar"
+                                  style={{ background: palette.bg, color: palette.text, cursor: cand.photoUrl ? "zoom-in" : "default" }}
+                                  onClick={(e) => {
+                                    if (cand.photoUrl) {
+                                      e.stopPropagation();
+                                      setZoomedImage(cand.photoUrl);
+                                    }
+                                  }}
+                                >
                                   {cand.photoUrl
                                     ? <img src={cand.photoUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                                     : nameInitials}
@@ -428,6 +438,48 @@ export default function VotingPage() {
             )}
           </button>
         </div>
+
+        {/* Lightbox */}
+        <AnimatePresence>
+          {zoomedImage && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              style={{
+                position: "fixed", inset: 0, zIndex: 9999,
+                background: "rgba(0,0,0,0.85)", backdropFilter: "blur(5px)",
+                display: "flex", alignItems: "center", justifyContent: "center", padding: "24px"
+              }}
+              onClick={() => setZoomedImage(null)}
+            >
+              <motion.img
+                initial={{ scale: 0.9 }}
+                animate={{ scale: 1 }}
+                exit={{ scale: 0.9 }}
+                src={zoomedImage}
+                alt="Enlarged portrait"
+                style={{
+                  maxWidth: "100%", maxHeight: "100%",
+                  borderRadius: "16px",
+                  boxShadow: "0 20px 60px rgba(0,0,0,0.5)"
+                }}
+              />
+              <button
+                style={{
+                  position: "absolute", top: "24px", right: "24px",
+                  background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)",
+                  color: "#fff", width: "40px", height: "40px", borderRadius: "50%",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  cursor: "pointer", fontSize: "20px"
+                }}
+                onClick={() => setZoomedImage(null)}
+              >
+                ✕
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </>
   );
@@ -726,11 +778,12 @@ const STYLES = `
 
   /* Avatar */
   .vb-avatar {
-    width: 72px; height: 72px; border-radius: 50%;
+    width: 90px; height: 110px; border-radius: 12px;
     display: flex; align-items: center; justify-content: center;
     font-size: 22px; font-weight: 800;
     margin-bottom: 14px; margin-top: 4px; flex-shrink: 0;
     overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   }
   .vb-cand-name  { font-size: 15px; font-weight: 800; color: #fff; margin: 0 0 8px; line-height: 1.3; }
   .vb-cand-tag   {

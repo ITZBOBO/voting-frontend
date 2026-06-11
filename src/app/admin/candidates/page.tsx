@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   getCandidates, createCandidate, updateCandidateDecision,
-  getPositions, getAdminUsers, type CreateCandidatePayload,
+  getPositions, getAdminUsers, fetchUserFromPortal, type CreateCandidatePayload,
 } from "@/lib/services";
 
 const STATUS_CFG: Record<string, { bg: string; color: string }> = {
@@ -72,6 +72,21 @@ export default function CandidatesPage() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["admin-candidates"] }),
   });
 
+  const portalMut = useMutation({
+    mutationFn: (matric: string) => fetchUserFromPortal(matric),
+    onSuccess: (data) => {
+      qc.invalidateQueries({ queryKey: ["admin-users"] });
+      setSelectedUser(data);
+      setForm({ ...form, userId: data.id });
+      setShowUserDropdown(false);
+      setUserSearch("");
+      setError("");
+    },
+    onError: (e: any) => {
+      setError(e.response?.data?.error || "Failed to fetch student from portal.");
+    }
+  });
+
   const stats = {
     total: candidates?.length || 0,
     approved: candidates?.filter(c => c.status === "APPROVED").length || 0,
@@ -132,7 +147,19 @@ export default function CandidatesPage() {
                     {showUserDropdown && userSearch.length > 0 && (
                       <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "#fff", border: "1px solid #e8eaf0", borderRadius: "10px", boxShadow: "0 8px 24px rgba(0,0,0,0.1)", zIndex: 300, maxHeight: "220px", overflowY: "auto" }}>
                         {filteredUsers.length === 0 ? (
-                          <div style={{ padding: "14px 16px", fontSize: "13px", color: "#9ca3af", textAlign: "center" }}>No students found</div>
+                          <div style={{ padding: "14px 16px", textAlign: "center" }}>
+                            <div style={{ fontSize: "13px", color: "#9ca3af", marginBottom: "8px" }}>No students found locally</div>
+                            {userSearch.length >= 3 && (
+                              <button
+                                type="button"
+                                onClick={(e) => { e.preventDefault(); portalMut.mutate(userSearch); }}
+                                disabled={portalMut.isPending}
+                                style={{ padding: "8px 14px", background: "#f0fdf4", color: "#16a34a", border: "1px solid #bbf7d0", borderRadius: "6px", fontSize: "12px", fontWeight: 600, cursor: portalMut.isPending ? "not-allowed" : "pointer", width: "100%", opacity: portalMut.isPending ? 0.7 : 1 }}
+                              >
+                                {portalMut.isPending ? "Searching..." : `Search portal for '${userSearch.toUpperCase()}'`}
+                              </button>
+                            )}
+                          </div>
                         ) : filteredUsers.map(u => (
                           <div
                             key={u.id}
@@ -254,7 +281,7 @@ export default function CandidatesPage() {
                   onMouseEnter={e => (e.currentTarget.style.background = "#fafbfd")}
                   onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
                 >
-                  <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: "#f0f4ff", border: "1px solid #e0e7ff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "13px", fontWeight: 700, color: "#2563eb", overflow: "hidden" }}>
+                  <div style={{ width: "32px", height: "40px", borderRadius: "8px", background: "#f0f4ff", border: "1px solid #e0e7ff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "13px", fontWeight: 700, color: "#2563eb", overflow: "hidden" }}>
                     {c.photoUrl ? <img src={c.photoUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : (c.user?.fullName?.[0] || "?").toUpperCase()}
                   </div>
                   <div>

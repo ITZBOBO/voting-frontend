@@ -197,6 +197,18 @@ export async function getElectionResults(electionId: string): Promise<ElectionRe
   return data;
 }
 
+export interface RecentVote {
+  id: string;
+  electionTitle: string;
+  voteHash: string;
+  createdAt: string;
+}
+
+export async function getRecentVotes(): Promise<RecentVote[]> {
+  const { data } = await api.get("/admin/recent-votes");
+  return data;
+}
+
 // ─── Vote Verification ─────────────────────────────────
 export interface VerifyVoteResponse {
   ok: boolean;
@@ -295,6 +307,11 @@ export interface CreateAdminUserPayload {
 export async function getAdminUsers(): Promise<AdminUser[]> {
   const { data } = await api.get("/admin/users");
   return Array.isArray(data) ? data : [];
+}
+
+export async function fetchUserFromPortal(matricNo: string) {
+  const { data } = await api.post("/admin/users/fetch-portal", { matricNo });
+  return data.user;
 }
 
 export async function createAdminUser(payload: CreateAdminUserPayload) {
