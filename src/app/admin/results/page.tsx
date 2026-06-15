@@ -6,13 +6,14 @@ import { getAdminElections, getElectionResults, getCandidates } from "@/lib/serv
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { Trophy, Medal } from "lucide-react";
 
 const CHART_COLORS = ["#2563eb", "#10b981", "#f59e0b", "#6366f1", "#ec4899", "#14b8a6"];
 
-const MEDAL: { [k: number]: { border: string; bg: string; label: string; icon: string } } = {
-  0: { border: "#fde68a", bg: "#fffbeb", label: "#d97706", icon: "🥇" },
-  1: { border: "#d1d5db", bg: "#f9fafb", label: "#6b7280", icon: "🥈" },
-  2: { border: "#fed7aa", bg: "#fff7ed", label: "#ea580c", icon: "🥉" },
+const MEDAL: { [k: number]: { border: string; bg: string; label: string; icon: React.ReactNode } } = {
+  0: { border: "#fde68a", bg: "#fffbeb", label: "#d97706", icon: <Medal size={16} color="#d97706" /> },
+  1: { border: "#d1d5db", bg: "#f9fafb", label: "#6b7280", icon: <Medal size={16} color="#6b7280" /> },
+  2: { border: "#fed7aa", bg: "#fff7ed", label: "#ea580c", icon: <Medal size={16} color="#ea580c" /> },
 };
 
 export default function AdminResultsPage() {
@@ -71,7 +72,7 @@ export default function AdminResultsPage() {
         if (idx === 0 && cand.count > 0) status = "Winner";
         return [
           cand.name,
-          cand.department || "—",
+          (cand as any).department || "—",
           cand.count.toString(),
           pct,
           status
@@ -176,7 +177,9 @@ export default function AdminResultsPage() {
                 {/* Position header */}
                 <div style={{ padding: "16px 20px", borderBottom: "1px solid #f0f1f5", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                    <span style={{ fontSize: "18px" }}>🏆</span>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "36px", height: "36px", borderRadius: "10px", background: "#fffbeb", color: "#d97706" }}>
+                      <Trophy size={18} />
+                    </div>
                     <div>
                       <div style={{ fontSize: "11px", fontWeight: 700, color: "#9ca3af", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "2px" }}>Winner</div>
                       <h3 style={{ fontSize: "15px", fontWeight: 700, color: "#0c1a3a" }}>{sorted[0]?.name || pos.positionName}</h3>
@@ -213,7 +216,7 @@ export default function AdminResultsPage() {
                               </div>
                               <div style={{ flex: 1 }}>
                                 <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                                  {medal && <span style={{ fontSize: "14px" }}>{medal.icon}</span>}
+                                  {medal && <div style={{ display: "flex", alignItems: "center" }}>{medal.icon}</div>}
                                   <span style={{ fontSize: "13.5px", fontWeight: idx === 0 ? 700 : 500, color: "#0c1a3a" }}>{cand.name}</span>
                                 </div>
                               </div>
