@@ -341,6 +341,21 @@ export default function VotingPage() {
 
                                 <p className="vb-cand-name">{cand.user?.fullName || cand.user?.matricNo}</p>
                                 <div className="vb-cand-tag">{cand.user?.matricNo || "—"}</div>
+                                {cand.user?.department?.name && (
+                                  <div style={{
+                                    padding: "3px 10px",
+                                    background: "rgba(124,58,237,0.1)",
+                                    border: "1px solid rgba(124,58,237,0.2)",
+                                    borderRadius: "999px",
+                                    fontSize: "10px",
+                                    color: "#c4b5fd",
+                                    fontWeight: 600,
+                                    marginBottom: "12px",
+                                    letterSpacing: "0.02em",
+                                  }}>
+                                    {cand.user.department.name}
+                                  </div>
+                                )}
 
                                 <div className="vb-cand-divider" />
 

@@ -114,7 +114,7 @@ export default function CreateElectionPage() {
           {/* ── STEP 0: Basic Info ── */}
           {step === 0 && (
             <div style={{ animation: "fadeSlideIn 0.3s ease" }}>
-              <SectionTitle icon="📋" title="Basic Information" subtitle="Set the election name and type" />
+              <SectionTitle icon="clipboard" title="Basic Information" subtitle="Set the election name and type" />
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", marginTop: "24px" }}>
                 <div style={{ gridColumn: "1 / -1" }}>
@@ -155,7 +155,7 @@ export default function CreateElectionPage() {
                       onChange={(e) => setForm({ ...form, departmentId: e.target.value || null })}
                       style={{ ...inputStyle, appearance: "none", paddingRight: "40px" }}
                     >
-                      <option value="">🌐 Campus-wide (All Departments)</option>
+                      <option value="">Campus-wide (All Departments)</option>
                       {departments?.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
                     </select>
                     <div style={{ position: "absolute", right: "14px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "#9ca3af" }}>
@@ -183,7 +183,7 @@ export default function CreateElectionPage() {
           {/* ── STEP 1: Schedule ── */}
           {step === 1 && (
             <div style={{ animation: "fadeSlideIn 0.3s ease" }}>
-              <SectionTitle icon="🗓️" title="Election Schedule" subtitle="Set when voting opens and closes (optional)" />
+              <SectionTitle icon="calendar" title="Election Schedule" subtitle="Set when voting opens and closes (optional)" />
 
               <div style={{ background: "linear-gradient(135deg, #eff6ff, #eef2ff)", border: "1px solid #c7d2fe", borderRadius: "12px", padding: "14px 16px", display: "flex", gap: "10px", marginTop: "20px", marginBottom: "24px" }}>
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: "1px" }}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
@@ -251,7 +251,7 @@ export default function CreateElectionPage() {
           {/* ── STEP 2: Settings & Review ── */}
           {step === 2 && (
             <div style={{ animation: "fadeSlideIn 0.3s ease" }}>
-              <SectionTitle icon="⚙️" title="Settings & Review" subtitle="Confirm details before creating the election" />
+              <SectionTitle icon="settings" title="Settings & Review" subtitle="Confirm details before creating the election" />
 
               {/* Toggle */}
               <div style={{ margin: "24px 0", padding: "18px 20px", background: "#f8faff", border: "1px solid #e0e7ff", borderRadius: "14px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -345,10 +345,37 @@ export default function CreateElectionPage() {
   );
 }
 
+const SECTION_ICONS: Record<string, React.ReactNode> = {
+  clipboard: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+      <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+      <line x1="9" y1="12" x2="15" y2="12"/>
+      <line x1="9" y1="16" x2="13" y2="16"/>
+    </svg>
+  ),
+  calendar: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="4" width="18" height="18" rx="2"/>
+      <line x1="16" y1="2" x2="16" y2="6"/>
+      <line x1="8" y1="2" x2="8" y2="6"/>
+      <line x1="3" y1="10" x2="21" y2="10"/>
+    </svg>
+  ),
+  settings: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+    </svg>
+  ),
+};
+
 function SectionTitle({ icon, title, subtitle }: { icon: string; title: string; subtitle: string }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-      <div style={{ width: "40px", height: "40px", borderRadius: "10px", background: "linear-gradient(135deg,#eff6ff,#eef2ff)", border: "1px solid #c7d2fe", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "18px", flexShrink: 0 }}>{icon}</div>
+      <div style={{ width: "40px", height: "40px", borderRadius: "10px", background: "linear-gradient(135deg,#eff6ff,#eef2ff)", border: "1px solid #c7d2fe", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+        {SECTION_ICONS[icon]}
+      </div>
       <div>
         <div style={{ fontSize: "16px", fontWeight: 700, color: "#0c1a3a" }}>{title}</div>
         <div style={{ fontSize: "12.5px", color: "#9ca3af" }}>{subtitle}</div>
