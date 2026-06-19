@@ -126,7 +126,12 @@ export interface Candidate {
   positionId: string;
   position?: Position;
   userId: string;
-  user?: { id: string; fullName: string; matricNo: string };
+  user?: { 
+    id: string; 
+    fullName: string; 
+    matricNo: string;
+    department?: { id: string; name: string } | null;
+  };
   status: "PENDING" | "APPROVED" | "REJECTED";
   createdAt: string;
 }
