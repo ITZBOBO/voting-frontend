@@ -12,6 +12,7 @@ export interface User {
   departmentId: string | null;
   department: string | null;
   roles: string[]; // e.g. ["voter"], ["admin"], ["super_admin"]
+  candidacies?: any[] | null;
 }
 
 interface AuthState {

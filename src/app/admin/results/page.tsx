@@ -72,7 +72,7 @@ export default function AdminResultsPage() {
         if (idx === 0 && cand.count > 0) status = "Winner";
         return [
           cand.name,
-          (cand as any).department || "—",
+          (cand as any).departmentCode || (cand as any).department || "—",
           cand.count.toString(),
           pct,
           status

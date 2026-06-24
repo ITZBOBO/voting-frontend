@@ -130,7 +130,7 @@ export interface Candidate {
     id: string; 
     fullName: string; 
     matricNo: string;
-    department?: { id: string; name: string } | null;
+    department?: { id: string; name: string; code?: string | null } | null;
   };
   status: "PENDING" | "APPROVED" | "REJECTED";
   createdAt: string;
@@ -389,6 +389,17 @@ export interface VoterActivity {
 export async function getVoterActivity(): Promise<VoterActivity[]> {
   const { data } = await api.get("/activity");
   return data.logs;
+}
+
+export interface UpdateCandidateProfilePayload {
+  manifesto?: string;
+  photoUrl?: string;
+  photoBase64?: string;
+}
+
+export async function updateCandidateProfile(payload: UpdateCandidateProfilePayload): Promise<{ ok: boolean; candidate: any }> {
+  const { data } = await api.patch("/candidate/profile", payload);
+  return data;
 }
 
 

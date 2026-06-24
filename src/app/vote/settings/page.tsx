@@ -4,11 +4,68 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuthStore } from "@/lib/authStore";
-import { getVoteHistory, changePassword, type VoteReceiptHistory } from "@/lib/services";
+import { getVoteHistory, changePassword, type VoteReceiptHistory, getCurrentUser, updateCandidateProfile } from "@/lib/services";
+import { useEffect } from "react";
 
 export default function VoterSettingsPage() {
   const { user } = useAuthStore();
-  const [activeTab, setActiveTab] = useState<"profile" | "security" | "notifications" | "history" | "about">("profile");
+  const [activeTab, setActiveTab] = useState<"profile" | "security" | "notifications" | "history" | "about" | "candidate">("profile");
+
+  const { data: freshUser, refetch: refetchUser } = useQuery({
+    queryKey: ["current-user"],
+    queryFn: getCurrentUser,
+  });
+
+  const [manifesto, setManifesto] = useState("");
+  const [photoUrl, setPhotoUrl] = useState("");
+  const [photoBase64, setPhotoBase64] = useState("");
+  const [fileName, setFileName] = useState("");
+  const [candLoading, setCandLoading] = useState(false);
+  const [candFeedback, setCandFeedback] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  const candidacy = freshUser?.candidacies?.[0] || user?.candidacies?.[0];
+  useEffect(() => {
+    if (candidacy) {
+      setManifesto(candidacy.manifesto || "");
+      setPhotoUrl(candidacy.photoUrl || "");
+    }
+  }, [candidacy]);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setFileName(file.name);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPhotoBase64(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleCandidateSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCandFeedback(null);
+    setCandLoading(true);
+    try {
+      await updateCandidateProfile({
+        manifesto,
+        photoUrl: photoUrl || undefined,
+        photoBase64: photoBase64 || undefined
+      });
+      setCandFeedback({ type: "success", text: "Candidate profile updated successfully!" });
+      setPhotoBase64("");
+      setFileName("");
+      refetchUser();
+    } catch (err: any) {
+      setCandFeedback({
+        type: "error",
+        text: err.response?.data?.error || "Failed to update candidate profile.",
+      });
+    } finally {
+      setCandLoading(false);
+    }
+  };
 
   // Form State
   const [currentPassword, setCurrentPassword] = useState("");
@@ -74,8 +131,11 @@ export default function VoterSettingsPage() {
     }
   };
 
+  const hasCandidacy = (freshUser?.candidacies?.length ?? 0) > 0 || (user?.candidacies?.length ?? 0) > 0;
+
   const tabs = [
     { id: "profile" as const, label: "Profile", icon: "user" },
+    ...(hasCandidacy ? [{ id: "candidate" as const, label: "Candidate Profile", icon: "candidate" }] : []),
     { id: "security" as const, label: "Security", icon: "lock" },
     { id: "notifications" as const, label: "Notifications", icon: "bell" },
     { id: "history" as const, label: "Audit Log & History", icon: "history" },
@@ -473,6 +533,86 @@ export default function VoterSettingsPage() {
               </div>
             )}
 
+            {activeTab === "candidate" && candidacy && (
+              <div className="vs-card">
+                <div className="vs-card-title">
+                  <TabIcon name="candidate" active={true} size={18} />
+                  Candidate Campaign Profile
+                </div>
+                <p className="vs-card-desc">
+                  You are registered as an aspirant/candidate for the position of <strong>{candidacy.positionName}</strong> in the <strong>{candidacy.electionTitle}</strong>. You can update your photo and manifesto campaign statement here.
+                </p>
+
+                <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "4px 10px", borderRadius: "999px", background: candidacy.status === "APPROVED" ? "#f0fdf4" : (candidacy.status === "REJECTED" ? "#fef2f2" : "#fffbeb"), border: `1px solid ${candidacy.status === "APPROVED" ? "#bbf7d0" : (candidacy.status === "REJECTED" ? "#fecaca" : "#fef3c7")}`, color: candidacy.status === "APPROVED" ? "#16a34a" : (candidacy.status === "REJECTED" ? "#dc2626" : "#d97706"), fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "20px" }}>
+                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: candidacy.status === "APPROVED" ? "#16a34a" : (candidacy.status === "REJECTED" ? "#dc2626" : "#ea580c") }} />
+                  Status: {candidacy.status}
+                </div>
+
+                {candFeedback && (
+                  <div className={`vs-alert vs-alert-${candFeedback.type}`}>
+                    {candFeedback.type === "error" ? (
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    ) : (
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    )}
+                    {candFeedback.text}
+                  </div>
+                )}
+
+                <form onSubmit={handleCandidateSave} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                  <div style={{ display: "flex", alignItems: "flex-start", gap: "16px", flexWrap: "wrap" }}>
+                    <div style={{ width: "80px", height: "100px", borderRadius: "10px", background: "#f1f5f9", border: "1px solid #e2e8f0", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      {photoBase64 ? (
+                        <img src={photoBase64} alt="Campaign Preview" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      ) : photoUrl ? (
+                        <img src={photoUrl} alt="Campaign Preview" style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={(e) => { e.currentTarget.style.display = "none"; }} />
+                      ) : (
+                        <span style={{ fontSize: "11px", color: "#94a3b8", fontWeight: 700 }}>No Photo</span>
+                      )}
+                    </div>
+                    <div style={{ flex: 1, minWidth: "220px" }}>
+                      <div className="vs-form-group" style={{ marginBottom: 0 }}>
+                        <label className="vs-input-label">Profile Photo</label>
+                        <div style={{ display: "flex", alignItems: "center", gap: "10px", marginTop: "4px" }}>
+                          <label className="vs-btn" style={{ background: "#f1f5f9", color: "#475569", border: "1px solid #cbd5e1", margin: 0, padding: "8px 14px", cursor: "pointer", fontSize: "12px" }}>
+                            Choose Image
+                            <input
+                              type="file"
+                              accept="image/*"
+                              style={{ display: "none" }}
+                              onChange={handleFileChange}
+                            />
+                          </label>
+                          {fileName && <span style={{ fontSize: "12px", color: "#475569", textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap", maxWidth: "180px" }}>{fileName}</span>}
+                        </div>
+                        <span style={{ fontSize: "10.5px", color: "#94a3b8", marginTop: 6, display: "block" }}>
+                          Upload an image file from your device. Recommended: square aspect ratio.
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="vs-form-group" style={{ marginBottom: 0 }}>
+                    <label className="vs-input-label">Campaign Manifesto / Statement</label>
+                    <textarea
+                      className="vs-input"
+                      rows={5}
+                      style={{ resize: "vertical", height: "120px" }}
+                      placeholder="Write your campaign points or statement here to convince voters..."
+                      value={manifesto}
+                      onChange={(e) => setManifesto(e.target.value)}
+                    />
+                  </div>
+
+                  <div>
+                    <button type="submit" className="vs-btn vs-btn-primary" disabled={candLoading} style={{ minWidth: "120px" }}>
+                      {candLoading ? "Saving..." : "Save Profile"}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
+
             {activeTab === "about" && (
               <div className="vs-card">
                 <div className="vs-card-title">
@@ -517,6 +657,8 @@ function TabIcon({ name, active, size = 15 }: { name: string; active: boolean; s
   const col = active ? "#2563eb" : "#64748b";
   const p = { width: size, height: size, viewBox: "0 0 24 24", fill: "none", stroke: col, strokeWidth: active ? 2.5 : 2, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
   switch (name) {
+    case "candidate":
+      return <svg {...p}><circle cx="12" cy="8" r="7"/><path d="M8.21 13.89L7 23l5-3 5 3-1.21-9.12"/><polyline points="8.21 13.89 12 10.5 15.79 13.89"/></svg>;
     case "user":
       return <svg {...p}><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;
     case "lock":

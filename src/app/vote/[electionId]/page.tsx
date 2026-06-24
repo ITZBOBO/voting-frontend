@@ -41,6 +41,10 @@ export default function VotingPage() {
   const [copied, setCopied] = useState<string | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [zoomedImage, setZoomedImage] = useState<string | null>(null);
+  const [viewingManifesto, setViewingManifesto] = useState<{ candidateName: string; manifesto: string } | null>(null);
+
+  const isAdmin = user?.roles?.some((r) => r === "admin" || r === "super_admin");
+  const isCandidate = (user?.candidacies?.length ?? 0) > 0;
 
   const { data: positions, isLoading } = useQuery({
     queryKey: ["voter-positions", eId],
@@ -220,6 +224,34 @@ export default function VotingPage() {
           {/* ── MAIN CONTENT ── */}
           <main className="vb-main">
 
+            {/* Eligibility Alert */}
+            {(isAdmin || isCandidate) && (
+              <div style={{
+                background: "rgba(239, 68, 68, 0.12)",
+                border: "1px solid rgba(239, 68, 68, 0.3)",
+                borderRadius: "12px",
+                padding: "14px 16px",
+                marginBottom: "24px",
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+                color: "#f87171",
+                fontSize: "13px",
+                fontWeight: 600
+              }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                  <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                <span>
+                  {isAdmin && isCandidate 
+                    ? "Admins and Candidates are not eligible to cast votes." 
+                    : isAdmin 
+                      ? "Administrators are not eligible to cast votes." 
+                      : "Registered candidates/aspirants are not eligible to cast votes."}
+                </span>
+              </div>
+            )}
+
             {/* Election Header */}
             <div className="vb-election-header">
               <div className="vb-election-meta-top">
@@ -365,7 +397,16 @@ export default function VotingPage() {
                                   <p className="vb-cand-manifesto" style={{ color: "#2d3748", fontStyle: "italic" }}>No manifesto provided.</p>
                                 )}
 
-                                <button className={`vb-manifesto-btn ${selected ? "selected" : ""}`}>
+                                <button
+                                  className={`vb-manifesto-btn ${selected ? "selected" : ""}`}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setViewingManifesto({
+                                      candidateName: cand.user?.fullName || cand.user?.matricNo || "Candidate",
+                                      manifesto: cand.manifesto || "No manifesto provided."
+                                    });
+                                  }}
+                                >
                                   <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
                                   </svg>
@@ -433,8 +474,8 @@ export default function VotingPage() {
           </div>
 
           {/* Submit */}
-          <button className={`vb-submit-btn ${selectedCount === 0 ? "disabled" : ""}`}
-            onClick={handleSubmitVotes} disabled={submitting || selectedCount === 0}>
+          <button className={`vb-submit-btn ${selectedCount === 0 || isAdmin || isCandidate ? "disabled" : ""}`}
+            onClick={handleSubmitVotes} disabled={submitting || selectedCount === 0 || isAdmin || isCandidate}>
             {submitting ? (
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <div className="vb-spinner-sm" />
@@ -492,6 +533,65 @@ export default function VotingPage() {
               >
                 ✕
               </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Manifesto Modal */}
+        <AnimatePresence>
+          {viewingManifesto && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              style={{
+                position: "fixed", inset: 0, zIndex: 9999,
+                background: "rgba(0,0,0,0.8)", backdropFilter: "blur(4px)",
+                display: "flex", alignItems: "center", justifyContent: "center", padding: "24px"
+              }}
+              onClick={() => setViewingManifesto(null)}
+            >
+              <motion.div
+                initial={{ scale: 0.95, y: 15 }}
+                animate={{ scale: 1, y: 0 }}
+                exit={{ scale: 0.95, y: 15 }}
+                style={{
+                  background: "#161b27",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  borderRadius: "16px",
+                  padding: "24px",
+                  maxWidth: "500px",
+                  width: "100%",
+                  boxShadow: "0 20px 60px rgba(0,0,0,0.6)",
+                  position: "relative"
+                }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <h3 style={{ fontSize: "16px", fontWeight: 800, color: "#fff", margin: "0 0 8px" }}>
+                  Manifesto: {viewingManifesto.candidateName}
+                </h3>
+                <div style={{ height: "1px", background: "rgba(255,255,255,0.06)", margin: "12px 0" }} />
+                <p style={{ fontSize: "13px", color: "#94a3b8", lineHeight: "1.7", whiteSpace: "pre-wrap", maxHeight: "300px", overflowY: "auto", margin: 0, paddingRight: "6px" }}>
+                  {viewingManifesto.manifesto}
+                </p>
+                <button
+                  style={{
+                    marginTop: "20px",
+                    width: "100%",
+                    padding: "10px",
+                    background: "rgba(255,255,255,0.05)",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    color: "#fff",
+                    borderRadius: "8px",
+                    cursor: "pointer",
+                    fontSize: "13px",
+                    fontWeight: 700
+                  }}
+                  onClick={() => setViewingManifesto(null)}
+                >
+                  Close
+                </button>
+              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>

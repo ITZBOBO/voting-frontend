@@ -291,7 +291,9 @@ export default function CandidatesPage() {
                   <div style={{ fontSize: "12.5px", color: "#6b7280" }}>
                     {positions?.find(p => p.id === c.positionId)?.name || "—"}
                   </div>
-                  <div style={{ fontSize: "12px", color: "#9ca3af" }}>CSC</div>
+                  <div style={{ fontSize: "12px", color: "#9ca3af" }}>
+                    {c.user?.department?.code || c.user?.department?.name || c.user?.matricNo?.split('/')?.[1] || "—"}
+                  </div>
                   <div>
                     <span style={{ display: "inline-block", fontSize: "11px", fontWeight: 700, color: cfg.color, background: cfg.bg, padding: "3px 10px", borderRadius: "100px" }}>
                       {c.status}

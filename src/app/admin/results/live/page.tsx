@@ -54,7 +54,7 @@ export default function LiveResultsPage() {
       return {
         ...candResult,
         positionName: pos.positionName,
-        department: "Computer Science",
+        department: candInfo?.user?.department?.code || candInfo?.user?.department?.name || candInfo?.user?.matricNo?.split('/')?.[1] || "—",
         status: candInfo?.status || "APPROVED",
         photoUrl: candInfo?.photoUrl,
       };
